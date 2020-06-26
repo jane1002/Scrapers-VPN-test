@@ -1,4 +1,4 @@
-const { openFolder, writeJSONFileToFolder } = require( './helpers');
+const { openFolder, writeJSONFileToFolder, downloadFiles } = require( './helpers');
 
 const querystring = require("querystring");
 require('dotenv').config();
@@ -6,6 +6,7 @@ const moment = require('moment');
 const fs = require('fs');
 const path = require("path");
 const  request = require('request');
+const url = require('url');
 
 const baseUrl = 'http://interchange.puc.texas.gov';
 let qs = {
@@ -23,8 +24,8 @@ let qs = {
 };
 
 qs = querystring.stringify(qs);
-const url = `${baseUrl}/Search/Search?${qs}`;
-console.log(url);
+const uri = `${baseUrl}/Search/Search?${qs}`;
+console.log(uri);
 
 // let docketNum = 'Case 49779';
 // let docketNum = 'Filings for 11281';
@@ -84,7 +85,7 @@ downloadFile(fileUrl,storePath,function(){
 });*/
 
 
-const re = openFolder('11281');
+const re = openFolder('11281/11281-35');
 
 const obj = {
     ID : 11281,
@@ -94,3 +95,7 @@ const obj = {
 writeJSONFileToFolder(obj, re, '11281.json');
 
 console.log(re);
+
+const fileUrls  = ['http://interchange.puc.texas.gov/Documents/50410_161_1071866.PDF', 'http://interchange.puc.texas.gov/Documents/11281_35_1053918.PDF'];
+
+downloadFiles(fileUrls, re);

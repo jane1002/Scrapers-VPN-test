@@ -3,3 +3,4 @@ node_modules
 .idea
 *.csv
 .env
+output/

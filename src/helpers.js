@@ -3,6 +3,7 @@ const os = require('os');
 const fs = require('fs');
 const request = require('request');
 const path = require("path");
+const url = require('url');
 
 exports.exportJsonObjToCSV = (data,  outputFile) => {
     const header = false;
@@ -74,4 +75,23 @@ const checkAndCreateFolder = (dirPath) => {
         console.log("Folder is already existed");
     }
 
+};
+
+
+exports.downloadFiles = (urls, filePath) => {
+
+    urls.forEach(link => {
+        const pathName = url.parse(link).pathname;
+        console.log('pathName', pathName);
+
+        const strArr = pathName.split('/');
+        const fileName = strArr[strArr.length - 1];
+        console.log('file Name', fileName);
+
+        const savePath = path.join(filePath, fileName);
+        const stream = fs.createWriteStream(savePath);
+        request(link).pipe(stream).on('close',function(){
+            console.log(fileName +' Download complete');
+        });
+    })
 };
