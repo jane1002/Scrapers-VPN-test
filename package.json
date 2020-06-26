@@ -1,0 +1,23 @@
+{
+	"name": "LegalProceedings-Scrapers",
+	"version": "0.0.1",
+	"description": "This is an example of an Apify actor.",
+	"dependencies": {
+		"apify": "^0.21.0",
+		"dotenv": "^8.2.0",
+		"json2csv": "^5.0.1",
+		"moment": "^2.27.0",
+		"querystring": "^0.2.0",
+		"request": "^2.88.2"
+	},
+	"devDependencies": {},
+	"scripts": {
+		"start": "node src/test.js",
+		"test": "echo \"Error: oops, the actor has no tests yet, sad!\" && exit 1",
+		"tx": "node src/TX/tx.js",
+		"fl": "node src/FL/fl.js",
+		"ca": "node src/CA/ca.js"
+	},
+	"author": "It's not you it's me",
+	"license": "ISC"
+}
