@@ -66,7 +66,6 @@ const checkAndCreateFolder = (dirPath) => {
         //     // console.log(stats);
         //     console.log("CREATE SUCCEED");
         //
-        //     // 检测文件类型
         //     console.log("(isFile) ? " + stats.isFile());
         //     console.log("(isDirectory) ? " + stats.isDirectory());
         // });

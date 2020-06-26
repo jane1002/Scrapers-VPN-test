@@ -52,17 +52,11 @@ Apify.main(async () => {
 
     };
 
-    const proxyConfiguration = await Apify.createProxyConfiguration({
-        groups: ['RESIDENTIAL'],
-        countryCode: 'US'
-    });
-
 // Crawl URLs
     const crawler = new Apify.CheerioCrawler({
         requestQueue,
         handlePageFunction,
-        requestTimeoutSecs: 60,
-        proxyConfiguration
+        requestTimeoutSecs: 60
     });
 
     await crawler.run();
