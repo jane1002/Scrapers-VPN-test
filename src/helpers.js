@@ -48,11 +48,12 @@ exports.writeJSONFileToFolder= (obj, folderPath, fileName) => {
     const data = JSON.stringify(obj,null,"\t");
     const pt = path.join(folderPath, fileName);
 
-    fs.writeFile(pt,data,function(err){
-        if (err) {
-            console.log('ERROR', err.code);
-        }
-    })
+//    fs.writeFile(pt,data,function(err){
+//        if (err) {
+//            console.log('ERROR', err.code);
+//        }
+//    })
+    fs.writeFileSync(pt,data);
 };
 
 const checkAndCreateFolder = (dirPath) => {
@@ -69,9 +70,9 @@ const checkAndCreateFolder = (dirPath) => {
         //     console.log("(isFile) ? " + stats.isFile());
         //     console.log("(isDirectory) ? " + stats.isDirectory());
         // });
-        console.log("Folder is created");
+//        console.log("Folder is created");
     } else {
-        console.log("Folder is already existed");
+//        console.log("Folder is already existed");
     }
 
 };
@@ -81,11 +82,9 @@ exports.downloadFiles = (urls, filePath) => {
 
     urls.forEach(link => {
         const pathName = url.parse(link).pathname;
-        console.log('pathName', pathName);
 
         const strArr = pathName.split('/');
         const fileName = strArr[strArr.length - 1];
-        console.log('file Name', fileName);
 
         const savePath = path.join(filePath, fileName);
         const stream = fs.createWriteStream(savePath);

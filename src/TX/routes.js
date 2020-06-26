@@ -1,6 +1,6 @@
 const Apify = require('apify');
 const { utils: { log } } = Apify;
-const { exportJsonObjToCSV, formatDocketNum, openFolder, writeJSONFileToFolder } = require('../helpers');
+const { exportJsonObjToCSV, formatDocketNum, openFolder, writeJSONFileToFolder, downloadFiles } = require('../helpers');
 const baseUrl = 'http://interchange.puc.texas.gov';
 
 exports.handleDockets = async ($, requestQueue) => {
@@ -11,7 +11,7 @@ exports.handleDockets = async ($, requestQueue) => {
 
     $('table').find('tr').each(async (index, el) => {
         // for test:
-        if(index > 0 && index < 10) {
+        if(index > 0 && index < 3) {
         // if(index != 0 && index < lastIndex - 1) {
             const docketNum = $(el).find('td > strong > a').eq(0).text().trim();
             let docketLink = $(el).find('td > strong > a').attr('href');
@@ -37,8 +37,9 @@ exports.handleDockets = async ($, requestQueue) => {
             exportJsonObjToCSV(docketInfo, 'TX-dockets.csv');
             await dataset.pushData(docketInfo);
             // open a folder naming it as docketID, path: output/docketID/
-            const pt = openFolder(docketInfo.docketNum);
+            const pt = openFolder(docketNum);
             // add docketJSON to this folder, path: output/docketID/docketID.json
+//            console.log('docket path', pt);
             writeJSONFileToFolder(docketInfo, pt, `${docketNum}.json`);
         }
     });
@@ -61,7 +62,9 @@ exports.handleFilings = async ($, requestQueue) => {
 
     $('table').find('tr').each(async (index, el) => {
         let filing = {};
-        if(index > 0 && index < lastIndex - 1) {
+//        if(index > 0 && index < lastIndex - 1) {
+        if(index > 0 && index < lastIndex - 1 && index < 3) {
+
             let itemNum;
             let itemLink = $(el).find('td > strong > a').attr('href');
 
@@ -157,9 +160,12 @@ exports.handleDocs = async ($, requestQueue) => {
     // todo:
     // find that docketID folder, create/check filing folder docketID-itemID: path: output/docketID/docketID-itemNum/
     const pt = openFolder(`${docketNum}/${docketNum}-${itemNum}`);
+//    console.log('filing path', pt);
+
     // add filing json file, path: output/docketID/docketID-itemNum/
     writeJSONFileToFolder(filing, pt, `${docketNum}-${itemNum}.json`);
     // add downloaded pdfs
+    downloadFiles(links, pt);
 };
 
 // helpers
