@@ -166,7 +166,7 @@ exports.handleDocs = async ($, requestQueue) => {
     // add filing json file, path: output/docketID/docketID-itemNum/
     writeJSONFileToFolder(filing, pt, `${docketNum}-${itemNum}.json`);
     // add downloaded pdfs
-    downloadFiles(links, pt);
+    await downloadFiles(links, pt);
 };
 
 // helpers

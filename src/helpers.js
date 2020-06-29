@@ -61,7 +61,7 @@ const checkAndCreateFolder = (dirPath) => {
 };
 
 
-exports.downloadFiles = (urls, filePath) => {
+exports.downloadFiles = async (urls, filePath) => {
 
     urls.forEach(link => {
         const pathName = url.parse(link).pathname;
@@ -69,9 +69,18 @@ exports.downloadFiles = (urls, filePath) => {
         const fileName = strArr[strArr.length - 1];
         const savePath = path.join(filePath, fileName);
 
-        const stream = fs.createWriteStream(savePath);
-        request(link).pipe(stream).on('close',function(){
-            console.log(fileName +' Download complete');
-        });
+        return new Promise(function(resolve, reject) {
+            const stream = fs.createWriteStream(savePath);
+            request(link).pipe(stream).on('close',function(){
+                console.log(fileName +' Download complete');
+                resolve('Finish download');
+            });
+
+            request(link).pipe(stream).on('error',function(){
+                console.log(fileName +' Download error');
+                reject('Download error');
+            });
+        })
+
     })
 };
