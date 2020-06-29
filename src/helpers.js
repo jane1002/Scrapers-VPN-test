@@ -34,14 +34,11 @@ exports.openFolder = (folderName) => {
     // todo: root folder path of output result can be set through config file
     const dir = path.resolve(__dirname, '../output');
     checkAndCreateFolder(dir);
-    // console.log(dir);
-    const dirPath = path.join(dir, folderName);
 
+    const dirPath = path.join(dir, folderName);
     checkAndCreateFolder(dirPath);
 
-    // return folder path
     return dirPath;
-
 };
 
 exports.writeJSONFileToFolder= (obj, folderPath, fileName) => {
@@ -60,21 +57,7 @@ const checkAndCreateFolder = (dirPath) => {
 
     if (!fs.existsSync(dirPath)) {
         fs.mkdirSync(dirPath, { recursive: true });
-        // fs.stat(dirPath, function(err, stats) {
-        //     if (err) {
-        //         return console.error(err);
-        //     }
-        //     // console.log(stats);
-        //     console.log("CREATE SUCCEED");
-        //
-        //     console.log("(isFile) ? " + stats.isFile());
-        //     console.log("(isDirectory) ? " + stats.isDirectory());
-        // });
-//        console.log("Folder is created");
-    } else {
-//        console.log("Folder is already existed");
     }
-
 };
 
 
@@ -82,11 +65,10 @@ exports.downloadFiles = (urls, filePath) => {
 
     urls.forEach(link => {
         const pathName = url.parse(link).pathname;
-
         const strArr = pathName.split('/');
         const fileName = strArr[strArr.length - 1];
-
         const savePath = path.join(filePath, fileName);
+
         const stream = fs.createWriteStream(savePath);
         request(link).pipe(stream).on('close',function(){
             console.log(fileName +' Download complete');
