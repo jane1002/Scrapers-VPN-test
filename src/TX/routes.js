@@ -34,6 +34,7 @@ exports.handleDockets = async ($, requestQueue) => {
             // console.log(JSON.stringify(docketInfo));
 
             // export docket metadata
+            log.info(`[SAVE DOCKET]: ${docketNum}`);
             exportJsonObjToCSV(docketInfo, 'TX-dockets.csv');
             await dataset.pushData(docketInfo);
             // open a folder naming it as docketID, path: output/docketID/
@@ -153,7 +154,7 @@ exports.handleDocs = async ($, requestQueue) => {
     filing.filingDescription = filingDescription;
     filing.links = links;
 
-    // console.log('filing: ', JSON.stringify(filing));
+    log.info(`[SAVE FILING]: ${docketNum}-${itemNum}`);
     exportJsonObjToCSV(filing, 'TX-filings.csv');
     const dataset = await Apify.openDataset('TX-FILINGS');
     await dataset.pushData(filing);
