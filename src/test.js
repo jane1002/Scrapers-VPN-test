@@ -5,7 +5,7 @@ require('dotenv').config();
 const moment = require('moment');
 const fs = require('fs');
 const path = require("path");
-const  request = require('request');
+const request = require('request');
 const url = require('url');
 
 const baseUrl = 'http://interchange.puc.texas.gov';
@@ -96,6 +96,10 @@ writeJSONFileToFolder(obj, re, '11281.json');
 
 console.log(re);
 
-const fileUrls  = ['http://interchange.puc.texas.gov/Documents/50410_161_1071866.PDF', 'http://interchange.puc.texas.gov/Documents/11281_35_1053918.PDF'];
+const testURLs = ['https://docs.cpuc.ca.gov/PublishedDocs/Efile/G000/M339/K545/339545412.PDF', 'https://docs.cpuc.ca.gov/PublishedDocs/Efile/G000/M339/K545/339545305.PDF'];
 
-downloadFiles(fileUrls, re);
+(async () => {
+    console.log('start..download');
+    await downloadFiles(testURLs, '/Users/y0f00pb/Documents/projects/LegalProceedings-Scrapers-test-version/out');
+})();
+

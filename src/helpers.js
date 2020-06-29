@@ -63,7 +63,7 @@ const checkAndCreateFolder = (dirPath) => {
 
 exports.downloadFiles = async (urls, filePath) => {
 
-    urls.forEach(link => {
+    return Promise.all(urls.map(async link => {
         const pathName = url.parse(link).pathname;
         const strArr = pathName.split('/');
         const fileName = strArr[strArr.length - 1];
@@ -76,11 +76,10 @@ exports.downloadFiles = async (urls, filePath) => {
                 resolve('Finish download');
             });
 
-            request(link).pipe(stream).on('error',function(){
-                console.log(fileName +' Download error');
+            request(link).pipe(stream).on('error',function(err){
+                console.log(fileName +' Download error: ', err.message);
                 reject('Download error');
             });
         })
-
-    })
+    }))
 };
