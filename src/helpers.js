@@ -1,4 +1,4 @@
-const {child_process} =  require('node/child_process');
+const { exec } = require('child_process');
 
 const json2csv = require('json2csv');
 const os = require('os');
@@ -88,11 +88,12 @@ const checkAndCreateFolder = (dirPath) => {
 
 
 const download = (url, filePath, resolve, reject) => {
+    console.log(filePath);
     const wget = 'wget -P ' + filePath + ' ' + url;
 
-    child_process.exec(wget, (err) => {
+    exec(wget, (err) => {
         if (err) {
-            console.log(`download fail: ${url}`);
+            console.log(`download fail: ${url}`, err.message);
             reject(err);
         } else {
             console.log(`download succ: ${url}`);
@@ -108,11 +109,11 @@ exports.downloadFiles = async (urls, filePath) => {
         const pathName = url.parse(link).pathname;
         const strArr = pathName.split('/');
         const fileName = strArr[strArr.length - 1];
-        const savePath = path.join(filePath, fileName);
+//        const savePath = path.join(filePath, fileName);
 
         return new Promise(function(resolve, reject) {
 
-            download(link, savePath, resolve, reject);
+            download(link, filePath, resolve, reject);
 
             // const stream = fs.createWriteStream(savePath);
             // request(link).pipe(stream).on('close',function(){

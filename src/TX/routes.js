@@ -161,8 +161,6 @@ exports.handleDocs = async ($, requestQueue) => {
     // todo:
     // find that docketID folder, create/check filing folder docketID-itemID: path: output/docketID/docketID-itemNum/
     const pt = openFolder(`${docketNum}/${docketNum}-${itemNum}`);
-//    console.log('filing path', pt);
-
     // add filing json file, path: output/docketID/docketID-itemNum/
     writeJSONFileToFolder(filing, pt, `${docketNum}-${itemNum}.json`);
     // add downloaded pdfs
