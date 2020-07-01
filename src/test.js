@@ -100,6 +100,6 @@ const testURLs = ['https://docs.cpuc.ca.gov/PublishedDocs/Efile/G000/M339/K545/3
 
 (async () => {
     console.log('start..download');
-    await downloadFiles(testURLs, '/Users/y0f00pb/Documents/projects/LegalProceedings-Scrapers-test-version/out');
+    await downloadFiles(testURLs, '/Users/y0f00pb/Documents/projects/LegalProceedings-Scrapers-test-version/output');
 })();
 

@@ -1,3 +1,5 @@
+const {child_process} =  require('node/child_process');
+
 const json2csv = require('json2csv');
 const os = require('os');
 const fs = require('fs');
@@ -61,6 +63,45 @@ const checkAndCreateFolder = (dirPath) => {
 };
 
 
+// exports.downloadFiles = async (urls, filePath) => {
+//
+//     return Promise.all(urls.map(async link => {
+//         const pathName = url.parse(link).pathname;
+//         const strArr = pathName.split('/');
+//         const fileName = strArr[strArr.length - 1];
+//         const savePath = path.join(filePath, fileName);
+//
+//         return new Promise(function(resolve, reject) {
+//             const stream = fs.createWriteStream(savePath);
+//             request(link).pipe(stream).on('close',function(){
+//                 console.log(fileName +' Download complete');
+//                 resolve('Finish download');
+//             });
+//
+//             request(link).pipe(stream).on('error',function(err){
+//                 console.log(fileName +' Download error: ', err.message);
+//                 reject('Download error');
+//             });
+//         })
+//     }))
+// };
+
+
+const download = (url, filePath, resolve, reject) => {
+    const wget = 'wget -P ' + filePath + ' ' + url;
+
+    child_process.exec(wget, (err) => {
+        if (err) {
+            console.log(`download fail: ${url}`);
+            reject(err);
+        } else {
+            console.log(`download succ: ${url}`);
+            resolve();
+        }
+    });
+}
+
+
 exports.downloadFiles = async (urls, filePath) => {
 
     return Promise.all(urls.map(async link => {
@@ -70,16 +111,23 @@ exports.downloadFiles = async (urls, filePath) => {
         const savePath = path.join(filePath, fileName);
 
         return new Promise(function(resolve, reject) {
-            const stream = fs.createWriteStream(savePath);
-            request(link).pipe(stream).on('close',function(){
-                console.log(fileName +' Download complete');
-                resolve('Finish download');
-            });
 
-            request(link).pipe(stream).on('error',function(err){
-                console.log(fileName +' Download error: ', err.message);
-                reject('Download error');
-            });
+            download(link, savePath, resolve, reject);
+
+            // const stream = fs.createWriteStream(savePath);
+            // request(link).pipe(stream).on('close',function(){
+            //     console.log(fileName +' Download complete');
+            //     resolve('Finish download');
+            // });
+
+            // request(link).pipe(stream).on('error',function(err){
+            //     console.log(fileName +' Download error: ', err.message);
+            //     reject('Download error');
+            // });
         })
     }))
+    .then(() => { console.log('all download succ');
+    }, () => {
+        console.log('some download fail');
+    });
 };
