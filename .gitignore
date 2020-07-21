@@ -1,5 +1,10 @@
 apify_storage
 node_modules
 .idea
+test.ts
 *.csv
 .env
+.DS_Store
+.vscode
+dist
+output/

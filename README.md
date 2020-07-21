@@ -1,7 +1,9 @@
 ## How to start
 - npm i
-- Switch start js file to FL/fl.js, CA/ca.js, TX/tx.js 
-- 'apify run -p' to start the scraper
+- "npm run tx" start TX scraper 
+- "npm run fl" start FL scraper
+- "npm run ca" start CA scraper 
+
 
 ---
 ## TX
