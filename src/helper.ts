@@ -72,7 +72,12 @@ export const downloadSync = (url, filePath): void => {
     url = encodeURI(url);
     const wget = `wget -P ${filePath} "${url}"`;
 
-    execSync(wget);
+    try {
+        execSync(wget);
+    } catch (err) {
+        fs.writeFileSync('./error.txt',`${url}${os.EOL}`, { flag: 'a' });
+        console.error(err.message);
+    }
 };
 
 export const downloadFilesSync =  (urls, filePath): void => {
