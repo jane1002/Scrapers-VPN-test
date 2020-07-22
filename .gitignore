@@ -2,9 +2,10 @@ apify_storage
 node_modules
 .idea
 test.ts
-*.csv
+relevant-dockets.csv
 .env
 .DS_Store
 .vscode
 dist
 output/
+error.txt

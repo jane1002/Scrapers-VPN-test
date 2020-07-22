@@ -95,7 +95,7 @@ export const CAScraper = async (): Promise<void> => {
                     staff
                 };
             });
-            docketDetail.docketID = formatDocketNum(docketDetail.docketID);
+            docketDetail.docketID = docketDetail.docketID.split('-')[0].trim();
 
             log.info(`[DOCKET DATA: ${JSON.stringify(docketDetail)}]`);
 
