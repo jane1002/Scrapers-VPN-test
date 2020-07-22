@@ -43,8 +43,6 @@ export const TXScraper = async (): Promise<void> => {
     }
 
     const handlePageFunction: CheerioHandlePage = async ({ request, $ }) => {
-        await Apify.utils.sleep(1500);
-
         const pathName = url.parse(request.url).pathname;
         switch (pathName) {
             case '/Search/Search':
@@ -60,7 +58,7 @@ export const TXScraper = async (): Promise<void> => {
     const crawler = new Apify.CheerioCrawler({
         requestQueue,
         handlePageFunction,
-        handlePageTimeoutSecs: 240,
+        handlePageTimeoutSecs: 480,
         requestTimeoutSecs: 240
 
     });
