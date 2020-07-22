@@ -27,6 +27,7 @@ export const handleFilings = async ($: CheerioSelector, requestQueue: RequestQue
 
     $('table').find('tr').each(async (index: number, el: CheerioElement) => {
 
+        // for test
         // if(index > 0 && index < lastIndex - 1 && index < 3) {
         if(index > 0 && index < lastIndex - 1) {
 
@@ -61,8 +62,8 @@ export const handleFilings = async ($: CheerioSelector, requestQueue: RequestQue
                 // const dataset = await Apify.openDataset('TX-FILINGS');
                 // await dataset.pushData(filing);
                 log.info(`[FILING DATA WITHOUT DOWNLOAD LINKS: ${JSON.stringify(filing)}`);
-                const pt = openFolder(`${docketNum}/${itemNum}`);
-                writeJSONFileToFolder(filing, pt, `${itemNum}.json`);
+                // const pt = openFolder(`${docketNum}/${itemNum}`);
+                // writeJSONFileToFolder(filing, pt, `${itemNum}.json`);
             }
         }
     });
@@ -114,9 +115,9 @@ export const handleDocs = async ($: CheerioSelector): Promise<void> => {
     // const dataset = await Apify.openDataset('TX-FILINGS');
     // await dataset.pushData(filing);
     //
-    const pt = openFolder(`${docketNum}/${itemNum}`);
-    writeJSONFileToFolder(filing, pt, `${itemNum}.json`);
-    downloadFilesSync(links, pt);
+    // const pt = openFolder(`${docketNum}/${itemNum}`);
+    // writeJSONFileToFolder(filing, pt, `${itemNum}.json`);
+    // downloadFilesSync(links, pt);
 };
 
 // helpers

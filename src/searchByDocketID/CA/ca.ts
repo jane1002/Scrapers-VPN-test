@@ -1,8 +1,6 @@
 import {
     downloadFilesSync,
     exportJsonObjToCSV,
-    formatDocketNum,
-    getDateFromEnv,
     openFolder,
     readRecordsFromCSVFile,
     writeJSONFileToFolder
@@ -138,6 +136,7 @@ const scrapingFilings = async (docketID, browser, page): Promise<Array<CAFiling>
     const filings: Array<CAFiling> = new Array<CAFiling>();
 
     const scrapingOnePageFillings = async (): Promise<Array<CAFiling>> => {
+        log.info(`[SCRAPING FILINGS ON ONE PAGE]`);
         return await page.evaluate((docketID) => {
             let rows = [];
             const filings = new Array<CAFiling>();
@@ -182,7 +181,7 @@ const scrapingFilings = async (docketID, browser, page): Promise<Array<CAFiling>
 
     let idx = 1;
     while(hasNextPage) {
-        await page.waitFor(1500);
+        await page.waitFor(2500);
 
         const fillingsArr: Array<CAFiling> = await scrapingOnePageFillings();
         filings.push(...fillingsArr);
@@ -192,12 +191,12 @@ const scrapingFilings = async (docketID, browser, page): Promise<Array<CAFiling>
             hasNextPage = true;
             if(idx == 1) {
                 await page.click('#apexir_DATA_PANEL > table > tbody > tr:nth-child(1) > td > span > a');
-                await page.waitFor(2500);
+                await page.waitFor(3500);
 
                 idx += 1;
             } else {
                 await page.click('#apexir_DATA_PANEL > table > tbody > tr:nth-child(1) > td > span > a:nth-child(2)');
-                await page.waitFor(2500);
+                await page.waitFor(3500);
             }
 
             // for test
@@ -239,10 +238,10 @@ const appendDownLinksToFilings = async (browser, filings: Array<CAFiling>): Prom
 
         // export module
         exportJsonObjToCSV(filing, 'CA-filings.csv');
-        const pt = openFolder(`${filing.docketID}/${filing.filingID}`);
-        writeJSONFileToFolder(filing, pt, `${filing.filingID}.json`);
-        if(filing.downloadLinks.length > 0)
-            downloadFilesSync(filing.downloadLinks, pt);
+        // const pt = openFolder(`${filing.docketID}/${filing.filingID}`);
+        // writeJSONFileToFolder(filing, pt, `${filing.filingID}.json`);
+        // if(filing.downloadLinks.length > 0)
+        //     downloadFilesSync(filing.downloadLinks, pt);
     }
 
     await docDownloadPage.close();
