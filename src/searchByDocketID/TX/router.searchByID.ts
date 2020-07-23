@@ -16,6 +16,7 @@ const baseUrl = 'http://interchange.puc.texas.gov';
  edge case: filings don't have download link, e.g.15599, need to be persisted here instead of document level
  */
 
+/*
 export const handleFilings = async ($: CheerioSelector, requestQueue: RequestQueue): Promise<void> => {
     // Handle details
     // log.info('[handle filings]');
@@ -24,13 +25,13 @@ export const handleFilings = async ($: CheerioSelector, requestQueue: RequestQue
     let docketNum = $('.layoutHeader h1').text();
 
     docketNum = formatDocketNum(docketNum);
-    const links = [];
+    const links = new Set<string>();
 
-    $('table').find('tr').each(async (index: number, el: CheerioElement) => {
+    $('table').find('tr').each((index: number, el: CheerioElement) => {
 
         // for test
-        if(index > 0 && index < lastIndex - 1 && index < 3) {
-        // if(index > 0 && index < lastIndex - 1) {
+        // if(index > 0 && index < lastIndex - 1 && index < 3) {
+        if(index > 0 && index < lastIndex - 1) {
 
             const filing: TXFiling = {} as TXFiling;
 
@@ -38,7 +39,7 @@ export const handleFilings = async ($: CheerioSelector, requestQueue: RequestQue
             const itemLink = $(el).find('td > strong > a').attr('href');
 
             if(itemLink) {
-                links.push(itemLink);
+                links.add(itemLink);
                 itemNum = $(el).find('td > strong > a').eq(0).text().trim();
                 // const url: URL = new URL(itemLink, baseUrl);
                 // await requestQueue.addRequest({
@@ -69,25 +70,27 @@ export const handleFilings = async ($: CheerioSelector, requestQueue: RequestQue
             }
         }
     });
-log.info(`[${links.length}]`);
-    links.forEach(async link => {
-        const url: URL = new URL(link, baseUrl);
+
+    log.info(`[${links.size}]`);
+    for(const l of links) {
+        const url: URL = new URL(l.toString(), baseUrl);
         await requestQueue.addRequest({
             url: url.href
         });
-    });
+    }
 
     await enqueueNextPageLinks($, requestQueue);
 };
+*/
 
 /*
     Only save PDF link, exclude zip.
     Download links: array, e.g 14406-844
  */
-
-export const handleDocs = async ($: CheerioSelector): Promise<void> => {
+/*
+export const handleDocs = ($: CheerioSelector):void => {
     // Handle doc details
-    log.info('[handle docs]');
+    console.log('handle docs in method');
 
     const filing: TXFiling = {} as TXFiling;
 
@@ -128,9 +131,10 @@ export const handleDocs = async ($: CheerioSelector): Promise<void> => {
     // writeJSONFileToFolder(filing, pt, `${itemNum}.json`);
     // downloadFilesSync(links, pt);
 };
+*/
 
 // helpers
-const enqueueNextPageLinks = async ($: CheerioSelector, requestQueue: RequestQueue): Promise<void> => {
+export const enqueueNextPageLinks = async ($: CheerioSelector, requestQueue: RequestQueue): Promise<void> => {
     const nextPageLink = $('.PagedList-skipToNext a').attr('href');
 
     if(nextPageLink) {
