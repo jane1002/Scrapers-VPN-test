@@ -120,24 +120,13 @@ const scrapingFilings = async (docketID, browser, page): Promise<Array<CAFiling>
     log.info('[SCRAPING FILINGS]');
     await page.click('div.bl-body > div > div > ul > li:nth-child(2) > a');
 
-    // await page.waitForNavigation({
-    //     waitUntil: 'domcontentloaded'
-    // });
-
-    await Promise.all([
-        await page.waitFor(4500),
-        await page.waitForNavigation({
-            waitUntil: 'domcontentloaded'
-        })
-    ]);
+    await page.waitFor(4500);
 
     // for debug
-    // page.on('console', msg => {
-    //     for (let i = 0; i < msg.args().length; ++i)
-    //         console.log(`${i}: ${msg.args()[i]}`);
-    // });
-
-
+    page.on('console', msg => {
+        for (let i = 0; i < msg.args().length; ++i)
+            console.log(`${i}: ${msg.args()[i]}`);
+    });
 
     // const scrapingOnePageFillings = async (): Promise<Array<CAFiling>> => {
     //     log.info(`[SCRAPING FILINGS ON ONE PAGE]`);
@@ -202,6 +191,9 @@ const scrapingFilings = async (docketID, browser, page): Promise<Array<CAFiling>
                     rows = evenRows.concat(oddRows);
                 }
 
+            console.log('odd row: ', oddRows.length);
+            console.log('even row: ', evenRows.length);
+            console.log('row: ', rows.length);
                 for(const row of rows) {
                     let filing: CAFiling = {} as CAFiling;
                     const cells = row.cells;
@@ -231,17 +223,24 @@ const scrapingFilings = async (docketID, browser, page): Promise<Array<CAFiling>
                 return filings;
 
             }, docketID);
+
+        log.info(`[END OF SCRAPING FILINGS ON ONE PAGE]`);
+
         filings.push(...fillingsArr);
 
-        if(await page.$('#apexir_DATA_PANEL > table > tbody > tr:nth-child(1) > td > span > a > img[title = "Next"]')) {
+        const flagPageFlag = await page.$('#apexir_DATA_PANEL > table > tbody > tr:nth-child(1) > td > span > a > img[title = "Next"]');
+
+        if(flagPageFlag) {
             log.info(`[DOC HAS MORE THAN ONE PAGE: this is page ${idx}]`);
             hasNextPage = true;
             if(idx == 1) {
+                console.log('index  = 1');
                 await page.click('#apexir_DATA_PANEL > table > tbody > tr:nth-child(1) > td > span > a');
                 await page.waitFor(3500);
 
             } else {
-            // #apexir_DATA_PANEL > table > tbody > tr:nth-child(4) > td > span > a:nth-child(2)
+                console.log('index  > 1');
+                // #apexir_DATA_PANEL > table > tbody > tr:nth-child(4) > td > span > a:nth-child(2)
                 await page.click('#apexir_DATA_PANEL > table > tbody > tr:nth-child(1) > td > span > a:nth-child(2)');
                 await page.waitFor(3500);
             }
@@ -251,7 +250,9 @@ const scrapingFilings = async (docketID, browser, page): Promise<Array<CAFiling>
             // if(idx == 3)
             //     break;
         } else {
+            console.log('no next page');
             hasNextPage = false;
+            await page.waitFor(1500);
             log.info(`[Last page, this is page ${idx} ]`);
         }
     }
