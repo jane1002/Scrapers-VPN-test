@@ -124,7 +124,7 @@ const scrapingFilings = async (docketID, browser, page): Promise<Array<CAFiling>
     //     waitUntil: 'domcontentloaded'
     // });
 
-    Promise.all([
+    await Promise.all([
         await page.waitFor(4500),
         await page.waitForNavigation({
             waitUntil: 'domcontentloaded'
