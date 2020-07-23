@@ -119,7 +119,17 @@ export const CAScraper = async (): Promise<void> => {
 const scrapingFilings = async (docketID, browser, page): Promise<Array<CAFiling>> => {
     log.info('[SCRAPING FILINGS]');
     await page.click('div.bl-body > div > div > ul > li:nth-child(2) > a');
-    await page.waitFor(2500);
+
+    // await page.waitForNavigation({
+    //     waitUntil: 'domcontentloaded'
+    // });
+
+    Promise.all([
+        await page.waitFor(4500),
+        await page.waitForNavigation({
+            waitUntil: 'domcontentloaded'
+        })
+    ]);
 
     // for debug
     // page.on('console', msg => {
