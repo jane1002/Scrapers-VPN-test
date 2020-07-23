@@ -241,6 +241,7 @@ const scrapingFilings = async (docketID, browser, page): Promise<Array<CAFiling>
             } else {
                 console.log('index  > 1');
                 // #apexir_DATA_PANEL > table > tbody > tr:nth-child(4) > td > span > a:nth-child(2)
+                await page.waitForSelector('#apexir_DATA_PANEL > table > tbody > tr:nth-child(1) > td > span > a:nth-child(2)');
                 await page.click('#apexir_DATA_PANEL > table > tbody > tr:nth-child(1) > td > span > a:nth-child(2)');
                 await page.waitFor(3500);
             }
