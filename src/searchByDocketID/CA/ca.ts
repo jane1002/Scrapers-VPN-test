@@ -180,7 +180,7 @@ const scrapingFilings = async (docketID, browser, page): Promise<Array<CAFiling>
         // const fillingsArr: Array<CAFiling> = await scrapingOnePageFillings();
 
         log.info(`[SCRAPING FILINGS ON ONE PAGE]`);
-        const fillingsArr: Array<CAFiling> =  await page.evaluate(() => {
+        const fillingsArr: Array<CAFiling> =  await page.evaluate((docketID) => {
                 let rows = [];
                 const filings = new Array<CAFiling>();
 
@@ -222,7 +222,7 @@ const scrapingFilings = async (docketID, browser, page): Promise<Array<CAFiling>
 
                 return filings;
 
-            });
+            }, docketID);
 
         log.info(`[END OF SCRAPING FILINGS ON ONE PAGE]`);
         log.info(`[FILING LENGTH OF ONE PAGE: ${fillingsArr.length}]`);
