@@ -1,6 +1,4 @@
-#!/usr/bin/env bash
-
-!/bin/bash
+#!/bin/bash
 
 #brew install wget
 

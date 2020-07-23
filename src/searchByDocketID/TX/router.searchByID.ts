@@ -24,12 +24,13 @@ export const handleFilings = async ($: CheerioSelector, requestQueue: RequestQue
     let docketNum = $('.layoutHeader h1').text();
 
     docketNum = formatDocketNum(docketNum);
+    const links = [];
 
     $('table').find('tr').each(async (index: number, el: CheerioElement) => {
 
         // for test
-        // if(index > 0 && index < lastIndex - 1 && index < 3) {
-        if(index > 0 && index < lastIndex - 1) {
+        if(index > 0 && index < lastIndex - 1 && index < 3) {
+        // if(index > 0 && index < lastIndex - 1) {
 
             const filing: TXFiling = {} as TXFiling;
 
@@ -37,11 +38,12 @@ export const handleFilings = async ($: CheerioSelector, requestQueue: RequestQue
             const itemLink = $(el).find('td > strong > a').attr('href');
 
             if(itemLink) {
+                links.push(itemLink);
                 itemNum = $(el).find('td > strong > a').eq(0).text().trim();
-                const url: URL = new URL(itemLink, baseUrl);
-                await requestQueue.addRequest({
-                    url: url.href
-                });
+                // const url: URL = new URL(itemLink, baseUrl);
+                // await requestQueue.addRequest({
+                //     url: url.href
+                // });
             } else {
                 itemNum = $(el).find('td').eq(0).text().trim();
             }
@@ -66,6 +68,13 @@ export const handleFilings = async ($: CheerioSelector, requestQueue: RequestQue
                 // writeJSONFileToFolder(filing, pt, `${itemNum}.json`);
             }
         }
+    });
+log.info(`[${links.length}]`);
+    links.forEach(async link => {
+        const url: URL = new URL(link, baseUrl);
+        await requestQueue.addRequest({
+            url: url.href
+        });
     });
 
     await enqueueNextPageLinks($, requestQueue);

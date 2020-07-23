@@ -47,9 +47,9 @@ export const TXScraper = async (): Promise<void> => {
         switch (pathName) {
             case '/Search/Search':
             case '/Search/Filings':
-                return handleFilings($, requestQueue);
+                return await handleFilings($, requestQueue);
             case '/Search/Documents':
-                return handleDocs($);
+                return await handleDocs($);
         }
 
     };
