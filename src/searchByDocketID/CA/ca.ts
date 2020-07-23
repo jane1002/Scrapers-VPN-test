@@ -215,7 +215,7 @@ const scrapingFilings = async (docketID, browser, page): Promise<Array<CAFiling>
                     filing = { docketID, filingID, filingDate, documentType, filedBy, filingDescription, downloadLinks };
                     filings.push(filing);
                     // test
-                    // break;
+                    break;
                 }
 
                 return filings;
