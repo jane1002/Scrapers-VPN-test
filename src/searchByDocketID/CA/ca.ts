@@ -15,24 +15,18 @@ dotenv.config({ path: '.env' });
 export const CAScraper = async (): Promise<void> => {
 
     const browser = await Apify.launchPuppeteer();
-    const page = await browser.newPage();
 
-    // Configure the navigation timeout
-    await page.setDefaultNavigationTimeout(0);
-
-    const docketDetailPage = await browser.newPage();
-    await docketDetailPage.setDefaultNavigationTimeout(0);
-
-    await page.setViewport({
-        width: 1200,
-        height: 800
-    });
-
-    const list:Array<string> = readRecordsFromCSVFile('relevant-dockets.csv', 'CA');
+    const list:Array<string> = readRecordsFromCSVFile('test-file.csv', 'CA');
 
     log.info(`[LENGTH OF CA DOCKETS: ${list.length}]`);
 
     for(const ID of list) {
+        const page = await browser.newPage();
+        await page.setDefaultNavigationTimeout(0);
+
+        const docketDetailPage = await browser.newPage();
+        await docketDetailPage.setDefaultNavigationTimeout(0);
+
         await page.bringToFront();
         await page.goto('https://apps.cpuc.ca.gov/apex/f?p=401', {
             waitUntil: 'domcontentloaded',
@@ -55,12 +49,11 @@ export const CAScraper = async (): Promise<void> => {
             '.apexir_WORKSHEET_DATA > tbody > tr > td:nth-child(1) > a',
             links => links.map(link => link.toString())
         );
-        await docketDetailPage.bringToFront();
 
         log.info(`[DOCKET LENGTH: ${docketLinks.length}]`);
         // todo: test if more than one docket link is possible?
         for (const link of docketLinks) {
-            await docketDetailPage.waitFor(3500);
+            await docketDetailPage.bringToFront();
 
             await docketDetailPage.goto(link, {
                 waitUntil: 'domcontentloaded'
@@ -116,74 +109,118 @@ export const CAScraper = async (): Promise<void> => {
             // only test first row in each page
             // break;
         }
-
+        await page.close();
+        await docketDetailPage.close();
     }
     await browser.close();
 };
 
+// page = detailPage
 const scrapingFilings = async (docketID, browser, page): Promise<Array<CAFiling>> => {
     log.info('[SCRAPING FILINGS]');
     await page.click('div.bl-body > div > div > ul > li:nth-child(2) > a');
-    await page.waitFor(1500);
+    await page.waitFor(2500);
 
     // for debug
-    page.on('console', msg => {
-        for (let i = 0; i < msg.args().length; ++i)
-            console.log(`${i}: ${msg.args()[i]}`);
-    });
+    // page.on('console', msg => {
+    //     for (let i = 0; i < msg.args().length; ++i)
+    //         console.log(`${i}: ${msg.args()[i]}`);
+    // });
 
+
+
+    // const scrapingOnePageFillings = async (): Promise<Array<CAFiling>> => {
+    //     log.info(`[SCRAPING FILINGS ON ONE PAGE]`);
+    //     return await page.evaluate((docketID) => {
+    //         let rows = [];
+    //         const filings = new Array<CAFiling>();
+    //
+    //         const evenRows = [...document.querySelectorAll('tr.even')];
+    //         const oddRows = [...document.querySelectorAll('tr.odd')];
+    //
+    //         if(evenRows && oddRows) {
+    //             rows = evenRows.concat(oddRows);
+    //         }
+    //
+    //         for(const row of rows) {
+    //             let filing: CAFiling = {} as CAFiling;
+    //             const cells = row.cells;
+    //             const filingDate = cells[0].textContent;
+    //             const documentType = cells[1].textContent;
+    //             const filedBy = cells[2].textContent;
+    //             const filingDescription = cells[3].textContent;
+    //             const downloadLinks: Array<string> = [];
+    //             let filingID;
+    //             let link = '';
+    //             if(cells[1].firstChild) {
+    //                 link = cells[1].firstChild.getAttribute('href');
+    //                 const pattern = /[0-9]+/;
+    //                 filingID =  pattern.exec(link)[0];
+    //             } else {
+    //                 console.log('[NO DOC LINK]');
+    //                 // todo: need test if this is possible
+    //             }
+    //             downloadLinks.push(link);
+    //
+    //             filing = { docketID, filingID, filingDate, documentType, filedBy, filingDescription, downloadLinks };
+    //             filings.push(filing);
+    //             // test
+    //             // break;
+    //         }
+    //
+    //         return filings;
+    //
+    //     }, docketID);
+    // };
     let hasNextPage = true;
     const filings: Array<CAFiling> = new Array<CAFiling>();
-
-    const scrapingOnePageFillings = async (): Promise<Array<CAFiling>> => {
-        log.info(`[SCRAPING FILINGS ON ONE PAGE]`);
-        return await page.evaluate((docketID) => {
-            let rows = [];
-            const filings = new Array<CAFiling>();
-
-            const evenRows = [...document.querySelectorAll('tr.even')];
-            const oddRows = [...document.querySelectorAll('tr.odd')];
-
-            if(evenRows && oddRows) {
-                rows = evenRows.concat(oddRows);
-            }
-
-            for(const row of rows) {
-                let filing: CAFiling = {} as CAFiling;
-                const cells = row.cells;
-                const filingDate = cells[0].textContent;
-                const documentType = cells[1].textContent;
-                const filedBy = cells[2].textContent;
-                const filingDescription = cells[3].textContent;
-                const downloadLinks: Array<string> = [];
-                let filingID;
-                let link = '';
-                if(cells[1].firstChild) {
-                    link = cells[1].firstChild.getAttribute('href');
-                    const pattern = /[0-9]+/;
-                    filingID =  pattern.exec(link)[0];
-                } else {
-                    console.log('[NO DOC LINK]');
-                    // todo: need test if this is possible
-                }
-                downloadLinks.push(link);
-
-                filing = { docketID, filingID, filingDate, documentType, filedBy, filingDescription, downloadLinks };
-                filings.push(filing);
-                // test
-                // break;
-            }
-
-            return filings;
-
-        }, docketID);
-    };
-
     let idx = 1;
     while(hasNextPage) {
-        await page.waitFor(2500);
+        // await page.waitFor(2500);
 
-        const fillingsArr: Array<CAFiling> = await scrapingOnePageFillings();
+        // const fillingsArr: Array<CAFiling> = await scrapingOnePageFillings();
+
+        log.info(`[SCRAPING FILINGS ON ONE PAGE]`);
+        const fillingsArr: Array<CAFiling> =  await page.evaluate((docketID) => {
+                let rows = [];
+                const filings = new Array<CAFiling>();
+
+                const evenRows = [...document.querySelectorAll('tr.even')];
+                const oddRows = [...document.querySelectorAll('tr.odd')];
+
+                if(evenRows && oddRows) {
+                    rows = evenRows.concat(oddRows);
+                }
+
+                for(const row of rows) {
+                    let filing: CAFiling = {} as CAFiling;
+                    const cells = row.cells;
+                    const filingDate = cells[0].textContent;
+                    const documentType = cells[1].textContent;
+                    const filedBy = cells[2].textContent;
+                    const filingDescription = cells[3].textContent;
+                    const downloadLinks: Array<string> = [];
+                    let filingID;
+                    let link = '';
+                    if(cells[1].firstChild) {
+                        link = cells[1].firstChild.getAttribute('href');
+                        const pattern = /[0-9]+/;
+                        filingID =  pattern.exec(link)[0];
+                    } else {
+                        console.log('[NO DOC LINK]');
+                        // todo: need test if this is possible
+                    }
+                    downloadLinks.push(link);
+
+                    filing = { docketID, filingID, filingDate, documentType, filedBy, filingDescription, downloadLinks };
+                    filings.push(filing);
+                    // test
+                    // break;
+                }
+
+                return filings;
+
+            }, docketID);
         filings.push(...fillingsArr);
 
         if(await page.$('#apexir_DATA_PANEL > table > tbody > tr:nth-child(1) > td > span > a > img[title = "Next"]')) {
@@ -193,18 +230,19 @@ const scrapingFilings = async (docketID, browser, page): Promise<Array<CAFiling>
                 await page.click('#apexir_DATA_PANEL > table > tbody > tr:nth-child(1) > td > span > a');
                 await page.waitFor(3500);
 
-                idx += 1;
             } else {
+            // #apexir_DATA_PANEL > table > tbody > tr:nth-child(4) > td > span > a:nth-child(2)
                 await page.click('#apexir_DATA_PANEL > table > tbody > tr:nth-child(1) > td > span > a:nth-child(2)');
                 await page.waitFor(3500);
             }
 
+            idx += 1;
             // for test
             // if(idx == 3)
             //     break;
         } else {
             hasNextPage = false;
-            log.info(`[ONE PAGE ONLY, this is page ${idx} ]`);
+            log.info(`[Last page, this is page ${idx} ]`);
         }
     }
 
