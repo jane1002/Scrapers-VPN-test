@@ -107,7 +107,7 @@ export const CAScraper = async (): Promise<void> => {
             }
 
             // only test first row in each page
-            // break;
+            break;
         }
         await page.close();
         await docketDetailPage.close();
