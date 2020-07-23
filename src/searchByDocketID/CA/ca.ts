@@ -236,11 +236,16 @@ const scrapingFilings = async (docketID, browser, page): Promise<Array<CAFiling>
             if(idx == 1) {
                 console.log('index  = 1');
                 await page.click('#apexir_DATA_PANEL > table > tbody > tr:nth-child(1) > td > span > a');
+                console.log('click idx = 1');
                 await page.waitFor(3500);
 
             } else {
                 console.log('index  > 1');
                 // #apexir_DATA_PANEL > table > tbody > tr:nth-child(4) > td > span > a:nth-child(2)
+                console.log('click idx >1');
+
+                const html = await page.content();
+                console.log(html);
                 await page.waitForSelector('#apexir_DATA_PANEL > table > tbody > tr:nth-child(1) > td > span > a:nth-child(2)');
                 await page.click('#apexir_DATA_PANEL > table > tbody > tr:nth-child(1) > td > span > a:nth-child(2)');
                 await page.waitFor(3500);
@@ -255,6 +260,7 @@ const scrapingFilings = async (docketID, browser, page): Promise<Array<CAFiling>
             hasNextPage = false;
             await page.waitFor(1500);
             log.info(`[Last page, this is page ${idx} ]`);
+            idx = 1;
         }
     }
 
