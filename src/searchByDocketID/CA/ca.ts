@@ -14,13 +14,13 @@ dotenv.config({ path: '.env' });
 
 export const CAScraper = async (): Promise<void> => {
 
-    const browser = await Apify.launchPuppeteer();
-
+    
     const list:Array<string> = readRecordsFromCSVFile('test-file.csv', 'CA');
-
+    
     log.info(`[LENGTH OF CA DOCKETS: ${list.length}]`);
-
+    
     for(const ID of list) {
+        const browser = await Apify.launchPuppeteer();
         const page = await browser.newPage();
         await page.setDefaultNavigationTimeout(0);
         await page.setCacheEnabled(false);
@@ -112,9 +112,11 @@ export const CAScraper = async (): Promise<void> => {
             break;
         }
         await page.close();
+        // let browserWSEndpoint = browser.wsEndpoint();
+        // browser.disconnect();
+        await browser.close();
     }
     console.log('END browser');
-    await browser.close();
 };
 
 /***
@@ -125,6 +127,61 @@ export const CAScraper = async (): Promise<void> => {
  */
 const scrapingFilings = async (docketID, browser, page): Promise<Array<CAFiling>> => {
     log.info('[SCRAPING FILINGS]');
+
+    page.on('close', () => {
+        console.log('close-->');
+    });
+    page.on('console', () => {
+        console.log('console-->');
+    });
+    page.on('dialog', () => {
+        console.log('dialog-->');
+    });
+    page.on('domcontentloaded', () => {
+        console.log('domcontentloaded-->');
+    });
+    page.on('error', () => {
+        console.log('error-->');
+    });
+    page.on('frameattached', () => {
+        console.log('frameattached-->');
+    });
+    page.on('framedetached', () => {
+        console.log('framedetached-->');
+    });
+    page.on('framenavigated', () => {
+        console.log('framenavigated-->');
+    });
+    page.on('load', () => {
+        console.log('load-->');
+    });
+    page.on('metrics', () => {
+        console.log('metrics-->');
+    });
+    page.on('pageerror', () => {
+        console.log('pageerror-->');
+    });
+    page.on('request', (req) => {
+        // console.log('request-->', req);
+        console.log('request-->');
+    });
+    page.on('requestfailed', () => {
+        console.log('requestfailed-->');
+    });
+    page.on('requestfinished', () => {
+        console.log('requestfinished-->');
+    });
+    page.on('response', (res) => {
+        // console.log('response-->', res);
+        console.log('response-->');
+    });
+    page.on('workercreated', () => {
+        console.log('workercreated-->');
+    });
+    page.on('workerdestroyed', () => {
+        console.log('workerdestroyed-->');
+    });
+
     await page.click('div.bl-body > div > div > ul > li:nth-child(2) > a');
     await page.waitFor(2500);
 
@@ -237,7 +294,7 @@ const scrapingOnePageFillings = async (page, docketID: string): Promise<Array<CA
             filing = { docketID, filingID, filingDate, documentType, filedBy, filingDescription, downloadLinks };
             filings.push(filing);
             // test
-            // break;
+            break;
         }
 
         return filings;
