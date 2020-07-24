@@ -8,6 +8,5 @@ relevant-dockets.csv
 dist
 output/
 error.txt
-*-filings.csv
 .DS_Store
 

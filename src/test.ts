@@ -18,10 +18,10 @@ import csv from 'csv-parser';
 import { Filing } from './models/Filing';
 
 
-const filePathCA = 'CA-filings.csv';
+const filePathCA = 'CA-filings-after.csv';
 const headerCA: Array<string> = ['docketID', 'filingID','filingDate', 'documentType', 'filedBy','filingDescription', 'downloadLinks'];
 
-const filePathTX = 'TX-filings.csv';
+const filePathTX = 'TX-filings-after.csv';
 const headerTX: Array<string> = ['docketID', 'filingID', 'fileStamp', 'party','filingDescription', 'downloadLinks'];
 
 /**

@@ -23,9 +23,7 @@ export const CAScraper = async (): Promise<void> => {
     for(const ID of list) {
         const page = await browser.newPage();
         await page.setDefaultNavigationTimeout(0);
-
-        const docketDetailPage = await browser.newPage();
-        await docketDetailPage.setDefaultNavigationTimeout(0);
+        await page.setCacheEnabled(false);
 
         await page.bringToFront();
         await page.goto('https://apps.cpuc.ca.gov/apex/f?p=401', {
@@ -38,11 +36,12 @@ export const CAScraper = async (): Promise<void> => {
         await page.type('#P1_PROCEEDING_NUM', ID, { delay: 150 });
         await page.click('#P1_SEARCH');
 
-        await page.waitFor(1500);
-
         const pageNum = 1;
+        // await page.waitForNavigation({
+        //     waitUntil: 'domcontentloaded'
+        // });
 
-        await page.waitFor(5000);
+        await page.waitFor(6000);
         log.info(`[SCRAPING SEARCH RESULT PAGE: ${pageNum}]`);
 
         const docketLinks: Array<string> = await page.$$eval(
@@ -53,6 +52,10 @@ export const CAScraper = async (): Promise<void> => {
         log.info(`[DOCKET LENGTH: ${docketLinks.length}]`);
         // todo: test if more than one docket link is possible?
         for (const link of docketLinks) {
+            const docketDetailPage = await browser.newPage();
+            await docketDetailPage.setDefaultNavigationTimeout(0);
+            await docketDetailPage.setCacheEnabled(false);
+
             await docketDetailPage.bringToFront();
 
             await docketDetailPage.goto(link, {
@@ -107,10 +110,10 @@ export const CAScraper = async (): Promise<void> => {
             }
 
             // only test first row in each page
+            await docketDetailPage.close();
             break;
         }
         await page.close();
-        await docketDetailPage.close();
     }
     await browser.close();
 };
@@ -120,13 +123,22 @@ const scrapingFilings = async (docketID, browser, page): Promise<Array<CAFiling>
     log.info('[SCRAPING FILINGS]');
     await page.click('div.bl-body > div > div > ul > li:nth-child(2) > a');
 
-    await page.waitFor(3500);
+    await page.waitFor(5500);
 
     // for debug
     page.on('console', msg => {
         for (let i = 0; i < msg.args().length; ++i)
             console.log(`${i}: ${msg.args()[i]}`);
     });
+    console.log('#####OPEN');
+    const html = await page.content();
+    console.log(html);
+
+    // pre check
+    while(await page.$('#apexir_DATA_PANEL > table > tbody > tr:nth-child(1) > td > span > a > img[title = "Previous"]')) {
+        await page.click('#apexir_DATA_PANEL > table > tbody > tr:nth-child(1) > td > span > a:nth-child(1)');
+        await page.waitFor(2500);
+    }
 
     // const scrapingOnePageFillings = async (): Promise<Array<CAFiling>> => {
     //     log.info(`[SCRAPING FILINGS ON ONE PAGE]`);
@@ -175,7 +187,7 @@ const scrapingFilings = async (docketID, browser, page): Promise<Array<CAFiling>
     const filings: Array<CAFiling> = new Array<CAFiling>();
     let idx = 1;
     while(hasNextPage) {
-        // await page.waitFor(2500);
+        await page.waitFor(3500);
 
         // const fillingsArr: Array<CAFiling> = await scrapingOnePageFillings();
 
@@ -227,28 +239,29 @@ const scrapingFilings = async (docketID, browser, page): Promise<Array<CAFiling>
         log.info(`[END OF SCRAPING FILINGS ON ONE PAGE]`);
         log.info(`[FILING LENGTH OF ONE PAGE: ${fillingsArr.length}]`);
         filings.push(...fillingsArr);
+        await page.waitFor(2500);
 
-        const flagPageFlag = await page.$('#apexir_DATA_PANEL > table > tbody > tr:nth-child(1) > td > span > a > img[title = "Next"]');
-
-        if(flagPageFlag) {
+        const nextPageIcon = await page.$('#apexir_DATA_PANEL > table > tbody > tr:nth-child(1) > td > span > a > img[title = "Next"]');
+        if(nextPageIcon) {
             log.info(`[DOC HAS MORE THAN ONE PAGE: this is page ${idx}]`);
             hasNextPage = true;
             if(idx == 1) {
                 console.log('index  = 1');
+                await page.waitForSelector('#apexir_DATA_PANEL > table > tbody > tr:nth-child(1) > td > span > a');
                 await page.click('#apexir_DATA_PANEL > table > tbody > tr:nth-child(1) > td > span > a');
                 console.log('click idx = 1');
-                await page.waitFor(3500);
+                await page.waitFor(2500);
 
             } else {
                 console.log('index  > 1');
                 // #apexir_DATA_PANEL > table > tbody > tr:nth-child(4) > td > span > a:nth-child(2)
                 console.log('click idx >1');
 
-                const html = await page.content();
-                console.log(html);
+                // const html = await page.content();
+                // console.log(html);
                 await page.waitForSelector('#apexir_DATA_PANEL > table > tbody > tr:nth-child(1) > td > span > a:nth-child(2)');
                 await page.click('#apexir_DATA_PANEL > table > tbody > tr:nth-child(1) > td > span > a:nth-child(2)');
-                await page.waitFor(3500);
+                await page.waitFor(2500);
             }
 
             idx += 1;
@@ -260,10 +273,8 @@ const scrapingFilings = async (docketID, browser, page): Promise<Array<CAFiling>
             hasNextPage = false;
             await page.waitFor(1500);
             log.info(`[Last page, this is page ${idx} ]`);
-            idx = 1;
         }
     }
-
     return filings;
 };
 
