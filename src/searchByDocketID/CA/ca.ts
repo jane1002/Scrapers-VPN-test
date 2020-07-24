@@ -332,7 +332,7 @@ const scrapingOnePageFillings = async (page, docketID: string): Promise<Array<CA
             filing = { docketID, filingID, filingDate, documentType, filedBy, filingDescription, downloadLinks };
             filings.push(filing);
             // test
-            break;
+            // break;
         }
 
         return filings;
