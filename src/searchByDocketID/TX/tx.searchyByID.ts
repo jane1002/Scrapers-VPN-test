@@ -19,13 +19,13 @@ export const TXScraper = async (): Promise<void> => {
     const baseUrl = 'http://interchange.puc.texas.gov';
 
     console.log(list.length);
-    // for(let i = 0; i < 10; i++) {
-    for(const docketID of list) {
+    for(let i = 0; i < 5; i++) {
+    // for(const docketID of list) {
         const qs = {
             // UtilityType: 'E',
             UtilityType: '',
-            ControlNumber: docketID,
-            // ControlNumber: list[i],
+            // ControlNumber: docketID,
+            ControlNumber: list[i],
             ItemMatch: 1,
             ItemNumber: '',
             UtilityName: '',
@@ -45,7 +45,7 @@ export const TXScraper = async (): Promise<void> => {
 
     const handlePageFunction: CheerioHandlePage = async ({ request, $ }) => {
         console.log('Handle page function.');
-        await Apify.utils.sleep(3000);
+        // await Apify.utils.sleep(3000);
         const pathName = url.parse(request.url).pathname;
 
         const handleFilings = async ($: CheerioSelector): Promise<void> => {
@@ -61,8 +61,8 @@ export const TXScraper = async (): Promise<void> => {
             $('table').find('tr').each((index: number, el: CheerioElement) => {
 
                 // for test
-                // if(index > 0 && index < lastIndex - 1 && index < 3) {
-                if(index > 0 && index < lastIndex - 1) {
+                if(index > 0 && index < lastIndex - 1 && index < 3) {
+                // if(index > 0 && index < lastIndex - 1) {
 
                     const filing: TXFiling = {} as TXFiling;
 
