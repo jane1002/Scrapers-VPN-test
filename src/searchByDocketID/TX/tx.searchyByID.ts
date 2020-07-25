@@ -19,6 +19,7 @@ export const TXScraper = async (): Promise<void> => {
     const baseUrl = 'http://interchange.puc.texas.gov';
 
     console.log(list.length);
+    // for test
     for(let i = 0; i < 5; i++) {
     // for(const docketID of list) {
         const qs = {
@@ -61,8 +62,8 @@ export const TXScraper = async (): Promise<void> => {
             $('table').find('tr').each((index: number, el: CheerioElement) => {
 
                 // for test
-                if(index > 0 && index < lastIndex - 1 && index < 3) {
-                // if(index > 0 && index < lastIndex - 1) {
+                // if(index > 0 && index < lastIndex - 1 && index < 3) {
+                if(index > 0 && index < lastIndex - 1) {
 
                     const filing: TXFiling = {} as TXFiling;
 
