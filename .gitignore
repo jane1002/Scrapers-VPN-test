@@ -1,7 +1,6 @@
 apify_storage
 node_modules
 .idea
-relevant-dockets.csv
 .env
 .DS_Store
 .vscode
@@ -9,4 +8,4 @@ dist
 output/
 error.txt
 .DS_Store
-
+*-Filings.csv

@@ -16,16 +16,15 @@ const baseUrl = 'http://interchange.puc.texas.gov';
  edge case: filings don't have download link, e.g.15599, need to be persisted here instead of document level
  */
 
-/*
 export const handleFilings = async ($: CheerioSelector, requestQueue: RequestQueue): Promise<void> => {
     // Handle details
-    // log.info('[handle filings]');
+    console.log('handle filings in method');
 
     const lastIndex = $('table tr').get().length;
     let docketNum = $('.layoutHeader h1').text();
 
     docketNum = formatDocketNum(docketNum);
-    const links = new Set<string>();
+    const links = new Array<string>();
 
     $('table').find('tr').each((index: number, el: CheerioElement) => {
 
@@ -39,8 +38,11 @@ export const handleFilings = async ($: CheerioSelector, requestQueue: RequestQue
             const itemLink = $(el).find('td > strong > a').attr('href');
 
             if(itemLink) {
-                links.add(itemLink);
                 itemNum = $(el).find('td > strong > a').eq(0).text().trim();
+                // remove duplicates
+                if(links.indexOf(itemLink) < 0) {
+                    links.push(itemLink);
+                }
                 // const url: URL = new URL(itemLink, baseUrl);
                 // await requestQueue.addRequest({
                 //     url: url.href
@@ -61,7 +63,7 @@ export const handleFilings = async ($: CheerioSelector, requestQueue: RequestQue
             filing.downloadLinks = [];
 
             if(!itemLink) {
-                exportJsonObjToCSV(filing, 'TX-filings.csv');
+                exportJsonObjToCSV(filing, 'TX-filings-01.csv');
                 // const dataset = await Apify.openDataset('TX-FILINGS');
                 // await dataset.pushData(filing);
                 log.info(`[FILING DATA WITHOUT DOWNLOAD LINKS: ${JSON.stringify(filing)}`);
@@ -71,7 +73,7 @@ export const handleFilings = async ($: CheerioSelector, requestQueue: RequestQue
         }
     });
 
-    log.info(`[${links.size}]`);
+    log.info(`[${links.length}]`);
     for(const l of links) {
         const url: URL = new URL(l.toString(), baseUrl);
         await requestQueue.addRequest({
@@ -81,13 +83,13 @@ export const handleFilings = async ($: CheerioSelector, requestQueue: RequestQue
 
     await enqueueNextPageLinks($, requestQueue);
 };
-*/
+
 
 /*
     Only save PDF link, exclude zip.
     Download links: array, e.g 14406-844
  */
-/*
+
 export const handleDocs = ($: CheerioSelector):void => {
     // Handle doc details
     console.log('handle docs in method');
@@ -123,7 +125,7 @@ export const handleDocs = ($: CheerioSelector):void => {
 
     log.info(`[FILING DATA WITH DOWNLOAD LINKS: ${JSON.stringify(filing)}`);
 
-    exportJsonObjToCSV(filing, 'TX-filings.csv');
+    exportJsonObjToCSV(filing, 'TX-filings-01.csv');
     // const dataset = await Apify.openDataset('TX-FILINGS');
     // await dataset.pushData(filing);
     //
@@ -131,10 +133,9 @@ export const handleDocs = ($: CheerioSelector):void => {
     // writeJSONFileToFolder(filing, pt, `${itemNum}.json`);
     // downloadFilesSync(links, pt);
 };
-*/
 
 // helpers
-export const enqueueNextPageLinks = async ($: CheerioSelector, requestQueue: RequestQueue): Promise<void> => {
+const enqueueNextPageLinks = async ($: CheerioSelector, requestQueue: RequestQueue): Promise<void> => {
     const nextPageLink = $('.PagedList-skipToNext a').attr('href');
 
     if(nextPageLink) {

@@ -96,7 +96,7 @@ export const handleFilings = async ($: CheerioSelector, requestQueue: RequestQue
             filing.downloadLinks = [];
 
             if(!itemLink) {
-                exportJsonObjToCSV(filing, 'TX-filings.csv');
+                exportJsonObjToCSV(filing, 'TX-filings-test.csv');
                 const dataset = await Apify.openDataset('TX-FILINGS');
                 await dataset.pushData(filing);
                 log.info(`[FILING DATA WITHOUT DOWNLOAD LINKS: ${JSON.stringify(filing)}`);
@@ -147,7 +147,7 @@ export const handleDocs = async ($: CheerioSelector): Promise<void> => {
 
     log.info(`[FILING DATA WITH DOWNLOAD LINKS: ${JSON.stringify(filing)}`);
 
-    exportJsonObjToCSV(filing, 'TX-filings.csv');
+    exportJsonObjToCSV(filing, 'TX-filings-01.csv');
     const dataset = await Apify.openDataset('TX-FILINGS');
     await dataset.pushData(filing);
     //

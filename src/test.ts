@@ -4,6 +4,8 @@ import {
     writeJSONFileToFolder
 } from './helper';
 import * as fs from 'fs';
+import dotenv from 'dotenv';
+dotenv.config({ path: '.env' });
 
 // const list:Array<string> = readRecordsFromCSVFile('relevant-dockets-test.csv', 'TX');
 // console.log(list.length);
@@ -16,37 +18,42 @@ import * as fs from 'fs';
 
 import csv from 'csv-parser';
 import { Filing } from './models/Filing';
+import crypto from 'crypto';
 
 
 const filePathCA = 'CA-filings-after.csv';
 const headerCA: Array<string> = ['docketID', 'filingID','filingDate', 'documentType', 'filedBy','filingDescription', 'downloadLinks'];
 
-const filePathTX = 'TX-filings-after.csv';
+// const filePathTX = 'TX-filings-after.csv';
+const filePathTX = 'TX-filings-test.csv';
 const headerTX: Array<string> = ['docketID', 'filingID', 'fileStamp', 'party','filingDescription', 'downloadLinks'];
+
+const filePathFL = 'FL-filings-after.csv';
+const headerFL: Array<string> = ['docketID', 'filingID', 'order', 'dateFiled','filingDescription', 'downloadLinks'];
+
 
 /**
  * Read record from csv file, and save one record to json and also download files(output folder: output)
  * @param filePath: file location
  * @param header: column name
  */
-const exportUtility = (filePath: string, header: Array<string>): void => {
-    const table = [];
+const exportUtility = async (filePath: string, header: Array<string>): Promise<void> => {
+    const table: Array<Filing> = [];
+
     fs.createReadStream(filePath)
         .pipe(csv({ headers: header }))
         .on('data', async function(filing) {
             try {
-                const row: Filing = filing;
-                // console.log(row);
-                console.log('docketID is: ' + filing.docketID);
-                console.log('filingID is: ' + filing.filingID);
+                const row: Filing = filing as Filing;
+                // console.log('docketID is: ' + filing.docketID);
+                // console.log('filingID is: ' + filing.filingID);
                 const downloadLinks: Array<string> = convertLinksToArray(filing.downloadLinks);
                 row.downloadLinks = downloadLinks;
 
                 // export
-                const pt = openFolder(`${filing.docketID}/${filing.filingID}`);
-                writeJSONFileToFolder(filing, pt, `${filing.filingID}.json`);
-                await downloadFiles(filing.downloadLinks, pt);
-
+                // const pt = openFolder(`${filing.docketID}/${filing.filingID}`);
+                // writeJSONFileToFolder(filing, pt, `${filing.filingID}.json`);
+                // await downloadFiles(filing.downloadLinks, pt);
                 table.push(row);
             }
             catch(err) {
@@ -54,16 +61,46 @@ const exportUtility = (filePath: string, header: Array<string>): void => {
                 console.log(err.message);
             }
         })
-        .on('end',function() {
+        .on('end',async function() {
             // some final operation
             // console.log(table);
             // export
             // saveDatatoFiles(table);
+
+            // remove deplicate
+            await removeDuplicatesFromCSV(table);
             console.log('Finish');
         });
 
 };
 
+/**
+ * Generate a hash value based on one data object
+ * @param data
+ */
+const generateHashVal = (data): string => {
+    const hash = crypto.createHash('md5');
+    return hash.update(JSON.stringify(data)).digest('base64');
+};
+
+const removeDuplicatesFromCSV = async (table: Array<Filing>): Promise<void> => {
+    const noDupliateTable: Array<string> = new Array<string>();
+
+    for(let idx = 0; idx < table.length; idx++) {
+        const filing = table[idx];
+        const hashVal = generateHashVal(filing);
+
+        if(noDupliateTable.indexOf(hashVal) >= 0) {
+            console.log('duplicate value',filing.docketID, filing.filingID, hashVal);
+            // const pt = openFolder(`${filing.docketID}/${filing.filingID}`);
+            // writeJSONFileToFolder(filing, pt, `${filing.filingID}.json`);
+            // await downloadFiles(filing.downloadLinks, pt);
+        } else {
+            noDupliateTable.push(hashVal);
+            // console.log('not duplicate value',filing.docketID, filing.filingID, hashVal);
+        }
+    }
+};
 
 const saveDatatoFiles = <T extends Filing>(filings: T[]): void  => {
     console.log(filings.length);
@@ -86,5 +123,31 @@ const convertLinksToArray = (downloadLinkStr: string):Array<string> => {
     }
 };
 
+(():void => {
+    let filePath;
+    let header;
 
-exportUtility(filePathTX, headerTX);
+    try{
+        const state = process.env.STATE ? process.env.STATE : new Error('No State is set');
+        switch (state) {
+            case 'FL':
+                filePath = filePathFL;
+                header = headerFL;
+                break;
+            case 'TX':
+                filePath = filePathTX;
+                header = headerTX;
+                break;
+            case 'CA':
+                filePath = filePathCA;
+                header = headerCA;
+                break;
+        }
+        exportUtility(filePath, header).then(() => console.log('end'));
+
+    } catch (err) {
+        console.log(err.message);
+    }
+})();
+
+
