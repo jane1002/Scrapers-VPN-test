@@ -24,8 +24,8 @@ import crypto from 'crypto';
 const filePathCA = 'CA-filings-after.csv';
 const headerCA: Array<string> = ['docketID', 'filingID','filingDate', 'documentType', 'filedBy','filingDescription', 'downloadLinks'];
 
-// const filePathTX = 'TX-filings-after.csv';
-const filePathTX = 'TX-filings-test.csv';
+const filePathTX = 'TX-filings-after.csv';
+// const filePathTX = 'TX-filings-test.csv';
 const headerTX: Array<string> = ['docketID', 'filingID', 'fileStamp', 'party','filingDescription', 'downloadLinks'];
 
 const filePathFL = 'FL-filings-after.csv';
@@ -51,9 +51,9 @@ const exportUtility = async (filePath: string, header: Array<string>): Promise<v
                 row.downloadLinks = downloadLinks;
 
                 // export
-                // const pt = openFolder(`${filing.docketID}/${filing.filingID}`);
-                // writeJSONFileToFolder(filing, pt, `${filing.filingID}.json`);
-                // await downloadFiles(filing.downloadLinks, pt);
+                const pt = openFolder(`${filing.docketID}/${filing.filingID}`);
+                writeJSONFileToFolder(filing, pt, `${filing.filingID}.json`);
+                await downloadFiles(filing.downloadLinks, pt);
                 table.push(row);
             }
             catch(err) {
@@ -68,7 +68,7 @@ const exportUtility = async (filePath: string, header: Array<string>): Promise<v
             // saveDatatoFiles(table);
 
             // remove deplicate
-            await removeDuplicatesFromCSV(table);
+            // await removeDuplicatesFromCSV(table);
             console.log('Finish');
         });
 
