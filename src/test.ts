@@ -92,10 +92,10 @@ const removeDuplicatesFromCSV = async (table: Array<Filing>): Promise<void> => {
 
         if(noDupliateTable.indexOf(hashVal) >= 0) {
             console.log('duplicate value',filing.docketID, filing.filingID, hashVal);
-            // const pt = openFolder(`${filing.docketID}/${filing.filingID}`);
-            // writeJSONFileToFolder(filing, pt, `${filing.filingID}.json`);
-            // await downloadFiles(filing.downloadLinks, pt);
         } else {
+            const pt = openFolder(`${filing.docketID}/${filing.filingID}`);
+            writeJSONFileToFolder(filing, pt, `${filing.filingID}.json`);
+            await downloadFiles(filing.downloadLinks, pt);
             noDupliateTable.push(hashVal);
             // console.log('not duplicate value',filing.docketID, filing.filingID, hashVal);
         }
