@@ -45,8 +45,8 @@ const exportUtility = async (filePath: string, header: Array<string>): Promise<v
         .on('data', async function(filing) {
             try {
                 const row: Filing = filing as Filing;
-                // console.log('docketID is: ' + filing.docketID);
-                // console.log('filingID is: ' + filing.filingID);
+                console.log('docketID is: ' + filing.docketID);
+                console.log('filingID is: ' + filing.filingID);
                 const downloadLinks: Array<string> = convertLinksToArray(filing.downloadLinks);
                 row.downloadLinks = downloadLinks;
 
