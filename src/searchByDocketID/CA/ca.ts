@@ -23,7 +23,7 @@ export const CAScraper = async (): Promise<void> => {
         const browser = await Apify.launchPuppeteer();
         const page = await browser.newPage();
         await page.setDefaultNavigationTimeout(0);
-        await page.setCacheEnabled(false);
+        // await page.setCacheEnabled(false);
 
         await page.bringToFront();
         await page.goto('https://apps.cpuc.ca.gov/apex/f?p=401', {
@@ -31,7 +31,7 @@ export const CAScraper = async (): Promise<void> => {
             timeout: 0
         });
 
-        await page.click('#P1_CLEAR');
+        // await page.click('#P1_CLEAR');
 
         await page.type('#P1_PROCEEDING_NUM', ID, { delay: 150 });
         await page.click('#P1_SEARCH');
