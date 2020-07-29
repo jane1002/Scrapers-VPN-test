@@ -14,13 +14,13 @@ dotenv.config({ path: '.env' });
 
 export const CAScraper = async (): Promise<void> => {
 
-    const browser = await Apify.launchPuppeteer();
 
-    const list:Array<string> = readRecordsFromCSVFile('test-file.csv', 'CA');
+    const list:Array<string> = readRecordsFromCSVFile('relevant-dockets.csv', 'CA');
 
     log.info(`[LENGTH OF CA DOCKETS: ${list.length}]`);
 
     for(const ID of list) {
+        const browser = await Apify.launchPuppeteer();
         const page = await browser.newPage();
         await page.setDefaultNavigationTimeout(0);
         await page.setCacheEnabled(false);
@@ -98,6 +98,8 @@ export const CAScraper = async (): Promise<void> => {
 
             log.info(`[END SCRAPING DOCKET: ${docketDetail.docketID} ]`);
 
+            // scraping documents
+            // R1211005
             const filings = await scrapingFilings(docketDetail.docketID, browser, docketDetailPage);
 
             if(filings.length > 0) {
@@ -109,12 +111,12 @@ export const CAScraper = async (): Promise<void> => {
 
             // only test first row in each page
             await docketDetailPage.close();
-            break;
+            // break;
         }
         await page.close();
+        await browser.close();
     }
     console.log('END browser');
-    await browser.close();
 };
 
 /***
@@ -204,7 +206,6 @@ const scrapingOnePageFillings = async (page, docketID: string): Promise<Array<CA
         let rows = [];
         const filings = new Array<CAFiling>();
 
-        // todo:
         const evenRows = [...document.querySelectorAll('tr.even')];
         const oddRows = [...document.querySelectorAll('tr.odd')];
 
@@ -285,5 +286,3 @@ const appendDownLinksToFilings = async (browser, filings: Array<CAFiling>): Prom
 
     await docDownloadPage.close();
 };
-
-
