@@ -223,17 +223,22 @@ const scrapingOnePageFillings = async (page, docketID: string): Promise<Array<CA
             const filedBy = cells[2].textContent;
             const filingDescription = cells[3].textContent;
             const downloadLinks: Array<string> = [];
-            let filingID;
+            let filingID = '';
             let link = '';
             if(cells[1].firstChild) {
                 link = cells[1].firstChild.getAttribute('href');
-                const pattern = /[0-9]+/;
-                filingID =  pattern.exec(link)[0];
+                // some link of 'TRANSCRIPT' is not pointing to any filing, e.g. A1812001
+                if(link.indexOf('DocID') >= 0) {
+                    const pattern = /[0-9]+/;
+                    filingID =  pattern.exec(link)[0];
+                    downloadLinks.push(link);
+                } else {
+                    link = '';
+                }
             } else {
                 console.log('[NO DOC LINK]');
                 // todo: need test if this is possible
             }
-            downloadLinks.push(link);
 
             filing = { docketID, filingID, filingDate, documentType, filedBy, filingDescription, downloadLinks };
             filings.push(filing);
