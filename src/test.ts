@@ -45,15 +45,15 @@ const exportUtility = async (filePath: string, header: Array<string>): Promise<v
         .on('data', async function(filing) {
             try {
                 const row: Filing = filing as Filing;
-                console.log('docketID is: ' + filing.docketID);
-                console.log('filingID is: ' + filing.filingID);
+                // console.log('docketID is: ' + filing.docketID);
+                // console.log('filingID is: ' + filing.filingID);
                 const downloadLinks: Array<string> = convertLinksToArray(filing.downloadLinks);
                 row.downloadLinks = downloadLinks;
 
                 // export
-                const pt = openFolder(`${filing.docketID}/${filing.filingID}`);
-                writeJSONFileToFolder(filing, pt, `${filing.filingID}.json`);
-                await downloadFiles(filing.downloadLinks, pt);
+                // const pt = openFolder(`${filing.docketID}/${filing.filingID}`);
+                // writeJSONFileToFolder(filing, pt, `${filing.filingID}.json`);
+                // await downloadFiles(filing.downloadLinks, pt);
                 table.push(row);
             }
             catch(err) {
@@ -68,7 +68,7 @@ const exportUtility = async (filePath: string, header: Array<string>): Promise<v
             // saveDatatoFiles(table);
 
             // remove deplicate
-            // await removeDuplicatesFromCSV(table);
+            await removeDuplicatesFromCSV(table);
             console.log('Finish');
         });
 
